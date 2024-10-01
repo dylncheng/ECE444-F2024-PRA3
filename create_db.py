@@ -2,7 +2,6 @@
 
 
 from project.app import app, db
-from project.models import Post
 
 
 with app.app_context():
@@ -11,4 +10,3 @@ with app.app_context():
 
     # commit the changes
     db.session.commit()
-    
