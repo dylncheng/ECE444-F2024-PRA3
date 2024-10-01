@@ -1,4 +1,5 @@
 from project.app import db
+from project.models import Post
 
 
 class Post(db.Model):
