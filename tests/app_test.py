@@ -14,9 +14,10 @@ def client():
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{BASE_DIR.joinpath(TEST_DB)}"
 
     with app.app_context():
+        db.drop_all()
         db.create_all()  # setup
         yield app.test_client()  # tests run here
-        db.drop_all()  # teardown
+        # db.drop_all()  # teardown
 
 
 def login(client, username, password):
@@ -84,3 +85,21 @@ def test_delete_message(client):
     rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
+
+def test_search(client):
+    """Ensure search functionality returns correct data"""
+    login(client, app.config["USERNAME"], app.config["PASSWORD"])
+    client.post("/add", data={"title":"test", "text": "test"}, follow_redirects=True)
+    rv = client.get("/search/?query=test")
+    assert rv.status_code == 200
+    assert b"test" in rv.data
+
+def test_login_required(client):
+    """Ensure user is logged in to post"""
+    rv = client.post("/add", data={"title":"test", "text": "test"})
+    assert rv.status_code == 401
+    rv = client.get("/delete/1")
+    assert rv.status_code == 401
+    assert b"Please log in." in rv.data
+
+
