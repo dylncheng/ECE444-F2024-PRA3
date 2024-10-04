@@ -17,7 +17,6 @@ def client():
         db.drop_all()
         db.create_all()  # setup
         yield app.test_client()  # tests run here
-        # db.drop_all()  # teardown
 
 
 def login(client, username, password):
